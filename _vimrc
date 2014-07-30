@@ -1,30 +1,13 @@
-" Akinwale Oshodi
+" VIM SETTINGS
+" Maintainer: Akinwale Oshodi
 
-set nocompatible   " Disable vi-compatibility
-filetype off
+"" Disable vi-compatibility
+" This must be first, because it changes other options as a side effect.
+set nocompatible   
+filetype off								" required! by vundle
+filetype plugin indent on 					" Now we can turn our filetype functionality back on
 
-" Now we can turn our filetype functionality back on
-filetype plugin indent on
-
-
-"{{{ LEADER SHORTCUTS
-" With a map leader it's possible to do extra key combinations like <leader>w saves the current file
-let mapleader = " "
-let g:mapleader = "\<space>"
-let g:EasyMotion_leader_key = '<Leader>'	" Easy motion stuff
-nmap <leader>w :w!<cr>						" Fast saves
-" }}}
-
-
-" COLORS {{{
-syntax enable           " enable syntax processing
-set t_Co=256
-colorscheme xoria256
-" }}}
-
-set linespace=15
-
-" PLUGINS {{{
+" VUNDLE {{{
 " To get plugins from Vim Scripts, you can reference the plugin by name as it appears on the site
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
@@ -42,6 +25,9 @@ Plugin 'jnwhiteh/vim-golang'
 Plugin 'sudo.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'Buffergator'
+Plugin 'Shougo/vimproc'
+Plugin 'Shougo/vimshell'
+Plugin 'Shougo/neocomplcache'
 
 " Plugin 'Lokatog/powerline'
 " Plugin 'scrooloose/nerdcommenter'
@@ -51,15 +37,29 @@ Plugin 'Buffergator'
 " Plugin 'garbas/vim-snipmate'
 " Plugin 'bonsaiben/bootstrap-snippets'
 " Plugin 'klen/python-mode'
-" }}}  
+" }}}
 
+"{{{ LEADER SHORTCUTS
+" With a map leader it's possible to do extra key combinations like <leader>w saves the current file
+let mapleader = " "
+let g:mapleader = "\<space>"
+let g:EasyMotion_leader_key = '<Leader>'	" Easy motion stuff
+nmap <leader>w :w!<cr>						" Fast saves
+" }}}
 
+" COLORS {{{
+syntax enable           " enable syntax processing
+set t_Co=256
+colorscheme xoria256
+" }}}
+
+"{{{ GENERAL SETTINGS
 "set guifont=menlo\ for\ powerline:h16
 "set guioptions-=T 				" Removes top toolbar
 "set guioptions-=r 				" Removes right hand scroll bar
-"set go-=L 						" Removes left hand scroll bar
+"set go-=L 					" Removes left hand scroll bar
 
-
+set linespace=15
 set showmode                    " always show what mode we're currently editing in
 set nowrap                      " don't wrap lines
 set tabstop=4                   " a tab is four spaces
@@ -83,12 +83,12 @@ set mouse=a
 set wildmenu            		" visual autocomplete for command menu
 set incsearch           		" search as characters are entered
 set hlsearch            		" highlight matches
+"}}}
 
 " LINE SHORCUTS {{{
 " Down is really the next line
 nnoremap j gj
 nnoremap k gk
-
 
 imap jj <esc>							"Easy escaping to normal model
 nnoremap ,cd :cd %:p:h<CR>:pwd<CR>		"Auto change directory to match current file ,cd
@@ -114,54 +114,6 @@ nmap <C-b> :NERDTreeToggle<cr>
 " nmap ,c :!open -a Google\ Chrome<cr>
 " }}}
 
-"Show (partial) command in the status line
-set showcmd
-
-" Create split below
-nmap :sp :rightbelow sp<cr>
-
-" Quickly go forward or backward to buffer
-nmap :bp :BufSurfBack<cr>
-nmap :bn :BufSurfForward<cr>
-
-
-
-" Swap files out of the project root
-set backupdir=~/.vim/backup//
-set directory=~/.vim/swap//
-
-
-" POWERLINE {{{
-" Powerline (Fancy thingy at bottom stuff)
-python from powerline.vim import setup as powerline_setup
-python powerline_setup()
-python del powerline_setup
-
-let g:Powerline_symbols = 'fancy'
-set laststatus=2   " Always show the statusline
-set encoding=utf-8 " Necessary to show Unicode glyphs
-set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
-" }}}
-
-" SEARCHING {{{
-autocmd cursorhold * set nohlsearch
-autocmd cursormoved * set hlsearch
-command! H let @/=""					" Remove search results
-highlight Search cterm=underline
-
-" }}}
-
-" If you prefer the Omni-Completion tip window to close when a selection is
-" made, these lines close it on movement in insert mode or when leaving insert mode
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif
-
-
-autocmd BufWritePre *.php :%s/\s\+$//e 			" Auto-remove trailing spaces
-
-nmap ,todo :e todo.txt<cr> 						" Edit todo list for project
-
-
 "LARAVEL {{{
 " Laravel framework commons
 nmap <leader>lr :e app/routes.php<cr>
@@ -184,8 +136,7 @@ endfunction
 nmap ,lf :call FacadeLookup()<cr>
 " }}}
 
-" CtrlP Stuff {{{
-
+" CTRLP STUFF {{{
 " Familiar commands for file/symbol browsing
 map <D-p> :CtrlP<cr>
 map <C-r> :CtrlPBufTag<cr>
@@ -196,11 +147,57 @@ set wildignore+=*/public/forum/**
 
 "}}}
 
+" POWERLINE {{{
+" Powerline (Fancy thingy at bottom stuff)
+python from powerline.vim import setup as powerline_setup
+python powerline_setup()
+python del powerline_setup
 
+let g:Powerline_symbols = 'fancy'
+set laststatus=2   " Always show the statusline
+set encoding=utf-8 " Necessary to show Unicode glyphs
+set noshowmode " Hide the default mode text (e.g. -- INSERT -- below the statusline)
+" }}}
+
+" SEARCHING {{{
+autocmd cursorhold * set nohlsearch
+autocmd cursormoved * set hlsearch
+command! H let @/=""					" Remove search results
+highlight Search cterm=underline
+" }}}
+
+" MISC {{{
+"Show (partial) command in the status line
+set showcmd
+
+" Create split below
+nmap :sp :rightbelow sp<cr>
+
+" Quickly go forward or backward to buffer
+nmap :bp :BufSurfBack<cr>
+nmap :bn :BufSurfForward<cr>
+
+" Set up backup dir where the swap files are stored
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+
+" If you prefer the Omni-Completion tip window to close when a selection is
+" made, these lines close it on movement in insert mode or when leaving insert mode
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+
+autocmd BufWritePre *.php :%s/\s\+$//e 			" Auto-remove trailing spaces
+
+nmap ,todo :e todo.txt<cr> 						" Edit todo list for project
 
 " Create/edit file in the current directory
 nmap :ed :edit %:p:h/
 
+" Automatically read files which have been changed outside of Vim, if we
+" haven't changed it already.
+set autoread
+
+""}}}
 
 " FOLDING {{{
 "=== folding ===
@@ -211,4 +208,4 @@ nnoremap <space> za
 set foldlevelstart=10    " start with fold level of 1
 " }}}
 
-" vim:foldmethod=marker:foldlevel=
+" vim:foldmethod=marker:foldlevel=0
